@@ -1,0 +1,471 @@
+<div class="container mx-auto px-4 py-4 sm:py-8">
+  <!-- Header -->
+  <div class="mb-4 sm:mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Task List</h1>
+    <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1 sm:mt-2">Manage and track all your tasks</p>
+  </div>
+
+  <!-- Error Alert -->
+  <div
+    *ngIf="error$ | async as error"
+    class="mb-6 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-300 px-4 py-3 rounded-lg flex items-center justify-between"
+  >
+    <div class="flex items-center">
+      <svg
+        class="w-5 h-5 mr-2"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      <span>{{ error }}</span>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6 transition-colors">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <!-- Search -->
+      <div>
+        <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Search by Title
+        </label>
+        <input
+          id="search"
+          type="text"
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onFilterChange()"
+          placeholder="Search tasks..."
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+        />
+      </div>
+
+      <!-- Status Filter -->
+      <div>
+        <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Filter by Status
+        </label>
+        <select
+          id="status"
+          [(ngModel)]="selectedStatus"
+          (ngModelChange)="onFilterChange()"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+        >
+          <option value="">All Statuses</option>
+          <option [value]="TaskStatus.TODO">To Do</option>
+          <option [value]="TaskStatus.IN_PROGRESS">In Progress</option>
+          <option [value]="TaskStatus.DONE">Done</option>
+        </select>
+      </div>
+
+      <!-- Category Filter -->
+      <div>
+        <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Filter by Category
+        </label>
+        <select
+          id="category"
+          [(ngModel)]="selectedCategory"
+          (ngModelChange)="onFilterChange()"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+        >
+          <option value="">All Categories</option>
+          <option *ngFor="let category of categories" [value]="category">
+            {{ category }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Reset Button -->
+      <div class="flex items-end">
+        <button
+          (click)="resetFilters()"
+          class="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200"
+        >
+          Reset Filters
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div
+    *ngIf="loading$ | async"
+    class="flex justify-center items-center py-12"
+  >
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  </div>
+
+  <!-- Task Table (Desktop) -->
+  <div
+    *ngIf="!(loading$ | async) && displayedTasks.length > 0"
+    class="hidden md:block bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-colors"
+  >
+    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+      <thead class="bg-gray-50 dark:bg-gray-700">
+        <tr>
+          <th
+            (click)="onSort('title')"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors w-1/5"
+          >
+            <div class="flex items-center space-x-1">
+              <span>Title</span>
+              <span class="text-blue-600 dark:text-blue-400">{{ getSortIndicator('title') }}</span>
+            </div>
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider w-1/3"
+          >
+            Description
+          </th>
+          <th
+            (click)="onSort('status')"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+          >
+            <div class="flex items-center space-x-1">
+              <span>Status</span>
+              <span class="text-blue-600 dark:text-blue-400">{{ getSortIndicator('status') }}</span>
+            </div>
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider"
+          >
+            Category
+          </th>
+          <th
+            (click)="onSort('createdAt')"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+          >
+            <div class="flex items-center space-x-1">
+              <span>Created</span>
+              <span class="text-blue-600 dark:text-blue-400">{{ getSortIndicator('createdAt') }}</span>
+            </div>
+          </th>
+          <th
+            class="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider"
+          >
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+        <tr
+          *ngFor="let task of displayedTasks; let i = index"
+          [class.bg-gray-50]="i % 2 === 1"
+          [class.dark:bg-gray-700]="i % 2 === 1"
+          class="hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+        >
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm font-medium text-gray-900 dark:text-white">{{ task.title }}</div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="text-sm text-gray-600 dark:text-gray-400 max-w-xs truncate">
+              {{ task.description }}
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span
+              class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full"
+              [ngClass]="getStatusBadgeClass(task.status)"
+            >
+              {{ formatStatus(task.status) }}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-900 dark:text-white">{{ task.category || 'N/A' }}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-600 dark:text-gray-400">{{ formatDate(task.createdAt) }}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <div class="flex justify-end space-x-2">
+              <button
+                (click)="openViewModal(task)"
+                class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                title="View"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
+                </svg>
+              </button>
+              <button
+                (click)="openEditModal(task)"
+                class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 transition-colors"
+                title="Edit"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
+              </button>
+              <button
+                (click)="openDeleteConfirm(task)"
+                class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors"
+                title="Delete"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Task Cards (Mobile) -->
+  <div
+    *ngIf="!(loading$ | async) && displayedTasks.length > 0"
+    class="md:hidden space-y-4"
+  >
+    <div
+      *ngFor="let task of displayedTasks"
+      class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow"
+    >
+      <div class="flex justify-between items-start mb-2">
+        <h3 class="text-lg font-semibold text-gray-900">{{ task.title }}</h3>
+        <span
+          class="px-2 py-1 text-xs font-semibold rounded-full"
+          [ngClass]="getStatusBadgeClass(task.status)"
+        >
+          {{ formatStatus(task.status) }}
+        </span>
+      </div>
+      <p class="text-sm text-gray-600 mb-3">{{ task.description }}</p>
+      <div class="space-y-1 mb-3">
+        <div class="flex items-center text-sm text-gray-600">
+          <span class="font-medium mr-2">Category:</span>
+          <span>{{ task.category || 'N/A' }}</span>
+        </div>
+        <div class="flex items-center text-sm text-gray-600">
+          <span class="font-medium mr-2">Created:</span>
+          <span>{{ formatDate(task.createdAt) }}</span>
+        </div>
+      </div>
+      <div class="flex justify-end space-x-2">
+        <button
+          (click)="openViewModal(task)"
+          class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+        >
+          View
+        </button>
+        <button
+          (click)="openEditModal(task)"
+          class="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+        >
+          Edit
+        </button>
+        <button
+          (click)="openDeleteConfirm(task)"
+          class="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div
+    *ngIf="!(loading$ | async) && displayedTasks.length === 0"
+    class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-12 text-center transition-colors"
+  >
+    <svg
+      class="mx-auto h-24 w-24 text-gray-400 dark:text-gray-600 mb-4"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+      />
+    </svg>
+    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No tasks yet</h3>
+    <p class="text-gray-600 dark:text-gray-400 mb-6">
+      Get started by creating your first task
+    </p>
+    <button
+      (click)="createTask()"
+      class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 inline-flex items-center"
+    >
+      <svg
+        class="w-5 h-5 mr-2"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 4v16m8-8H4"
+        />
+      </svg>
+      Create Task
+    </button>
+  </div>
+
+  <!-- View Modal -->
+  <div
+    *ngIf="showViewModal && selectedTask"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+    (click)="closeViewModal()"
+  >
+    <div
+      class="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="flex justify-between items-start mb-4">
+        <h2 class="text-2xl font-bold text-gray-900">Task Details</h2>
+        <button
+          (click)="closeViewModal()"
+          class="text-gray-400 hover:text-gray-600"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+          <p class="text-gray-900">{{ selectedTask.title }}</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+          <p class="text-gray-900">{{ selectedTask.description }}</p>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <span
+              class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full"
+              [ngClass]="getStatusBadgeClass(selectedTask.status)"
+            >
+              {{ formatStatus(selectedTask.status) }}
+            </span>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <p class="text-gray-900">{{ selectedTask.category || 'N/A' }}</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Created</label>
+            <p class="text-gray-900">{{ formatDate(selectedTask.createdAt) }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Updated</label>
+            <p class="text-gray-900">{{ formatDate(selectedTask.updatedAt) }}</p>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Task ID</label>
+          <p class="text-gray-600 text-sm font-mono">{{ selectedTask.id }}</p>
+        </div>
+      </div>
+      <div class="mt-6 flex justify-end">
+        <button
+          (click)="closeViewModal()"
+          class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div
+    *ngIf="showDeleteConfirm && selectedTask"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+    (click)="closeDeleteConfirm()"
+  >
+    <div
+      class="bg-white rounded-lg shadow-xl max-w-md w-full p-6"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="flex items-start mb-4">
+        <div class="flex-shrink-0">
+          <svg
+            class="h-6 w-6 text-red-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+        </div>
+        <div class="ml-3 flex-1">
+          <h3 class="text-lg font-semibold text-gray-900">Delete Task</h3>
+          <p class="mt-2 text-sm text-gray-600">
+            Are you sure you want to delete "{{ selectedTask.title }}"? This action cannot be undone.
+          </p>
+        </div>
+      </div>
+      <div class="flex justify-end space-x-3 mt-6">
+        <button
+          (click)="closeDeleteConfirm()"
+          class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          (click)="deleteTask()"
+          class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task Form Component (Create/Edit) -->
+  <app-task-form
+    [show]="showCreateModal || showEditModal"
+    [mode]="formMode"
+    [task]="selectedTask"
+    (taskSaved)="onTaskSaved($event)"
+    (cancelled)="closeFormModal()"
+    (taskDeleted)="openDeleteConfirm($event)"
+  ></app-task-form>
+</div>

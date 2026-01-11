@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/out-tsc",
+    "types": ["jest", "node"],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "files": ["src/test-setup.ts"],
+  "include": ["src/**/*.spec.ts", "src/**/*.d.ts", "test/**/*.spec.ts"]
+}

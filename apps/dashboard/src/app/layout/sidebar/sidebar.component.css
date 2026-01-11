@@ -1,0 +1,52 @@
+/* Sidebar specific styles */
+
+/* Ensure sidebar is properly positioned and takes full height */
+aside {
+  top: 0;
+  bottom: 0;
+  min-height: 100%;
+}
+
+/* On desktop, ensure sidebar takes full height of parent */
+@media (min-width: 768px) {
+  aside {
+    height: 100%;
+  }
+}
+
+/* Active link styling */
+a[routerLinkActive] {
+  position: relative;
+}
+
+/* Smooth transitions */
+aside,
+.bg-black {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Scrollbar styling for dark mode */
+aside::-webkit-scrollbar {
+  width: 6px;
+}
+
+aside::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+aside::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.dark aside::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+aside::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.dark aside::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}

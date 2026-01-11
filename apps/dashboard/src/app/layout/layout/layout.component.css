@@ -1,0 +1,55 @@
+/* Layout specific styles */
+
+/* Ensure proper height calculations */
+.min-h-screen {
+  min-height: 100vh;
+}
+
+/* Smooth transitions for dark mode */
+.min-h-screen,
+main {
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Mobile floating action button */
+button.fixed {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Main content scrollbar styling */
+main::-webkit-scrollbar {
+  width: 8px;
+}
+
+main::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+main::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+.dark main::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+main::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.dark main::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}

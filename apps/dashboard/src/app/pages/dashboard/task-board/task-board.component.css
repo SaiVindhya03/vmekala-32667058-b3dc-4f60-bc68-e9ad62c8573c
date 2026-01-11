@@ -1,0 +1,149 @@
+/* CDK Drag and Drop Styles */
+
+/* Drop list styling */
+.cdk-drop-list {
+  transition: background-color 0.3s ease;
+}
+
+/* Active drop target indicator */
+.cdk-drop-list.cdk-drop-list-dragging {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Drag item while dragging */
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Dragging state */
+.cdk-drag {
+  transition: box-shadow 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drag:active {
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+              0 8px 10px 1px rgba(0, 0, 0, 0.14),
+              0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  cursor: grabbing !important;
+}
+
+/* Preview styling */
+.cdk-drag-preview {
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+              0 8px 10px 1px rgba(0, 0, 0, 0.14),
+              0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  opacity: 0.9;
+  cursor: grabbing;
+}
+
+/* Placeholder styling */
+.cdk-drag-placeholder {
+  opacity: 0.5;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Smooth animations */
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging .cdk-drag {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Handle cursor */
+[cdkDragHandle] {
+  cursor: grab;
+}
+
+[cdkDragHandle]:active {
+  cursor: grabbing;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .cdk-drag-preview {
+    max-width: 90vw;
+  }
+}
+
+/* Custom scrollbar for columns */
+.cdk-drop-list {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 #f7fafc;
+}
+
+/* Dark mode scrollbar */
+.dark .cdk-drop-list {
+  scrollbar-color: #4b5563 #1f2937;
+}
+
+.cdk-drop-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.cdk-drop-list::-webkit-scrollbar-track {
+  background: #f7fafc;
+  border-radius: 3px;
+}
+
+/* Dark mode scrollbar track */
+.dark .cdk-drop-list::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+.cdk-drop-list::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 3px;
+}
+
+/* Dark mode scrollbar thumb */
+.dark .cdk-drop-list::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+.cdk-drop-list::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+/* Dark mode scrollbar thumb hover */
+.dark .cdk-drop-list::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Task card hover effect */
+.cdk-drag:hover {
+  transform: translateY(-2px);
+  transition: transform 0.2s ease;
+}
+
+/* Loading overlay */
+.opacity-50 {
+  pointer-events: none;
+}
+
+/* Animation for task cards */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cdk-drag {
+  animation: slideIn 0.3s ease-out;
+}

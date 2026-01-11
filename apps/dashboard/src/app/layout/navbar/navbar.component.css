@@ -1,0 +1,28 @@
+/* Navbar specific styles */
+
+/* Smooth transitions for dark mode */
+nav {
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* User menu dropdown animation */
+.absolute.right-0 {
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Focus visible for accessibility */
+button:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
