@@ -126,4 +126,4 @@ npx nx build dashboard       # Build frontend
 - **401 Unauthorized**: Token expired or invalid - log in again
 - **403 Forbidden**: User lacks required permission for action
 - **Port in use**: Kill process or change `PORT` in `.env`
-- 
+
