@@ -2,6 +2,10 @@
 
 Full-stack task management platform with Role-Based Access Control (RBAC), multi-organization support, and audit logging.
 
+## Demo
+
+[▶️ Watch the Demo Video](https://drive.google.com/file/d/1NTEFDozVfBYUzQkxLIe13ddqbakC4M7g/view?usp=sharing)
+
 ## Tech Stack
 
 - **Backend**: NestJS, TypeORM, SQLite/PostgreSQL, Passport JWT
