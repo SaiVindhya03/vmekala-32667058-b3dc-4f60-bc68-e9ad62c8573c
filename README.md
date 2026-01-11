@@ -12,6 +12,11 @@ Full-stack task management platform with Role-Based Access Control (RBAC), multi
 - **Frontend**: Angular 21, TailwindCSS, NgRx
 - **Build**: Nx Monorepo
 
+## Additional Features
+
+- Light/Dark mode with toggle button
+- Shortcut to update the status of the task using drag and drop feature.
+
 ## Quick Start
 
 ```bash
@@ -121,7 +126,4 @@ npx nx build dashboard       # Build frontend
 - **401 Unauthorized**: Token expired or invalid - log in again
 - **403 Forbidden**: User lacks required permission for action
 - **Port in use**: Kill process or change `PORT` in `.env`
-
-## License
-
-MIT
+- 
