@@ -8,7 +8,7 @@ Full-stack task management platform with Role-Based Access Control (RBAC), multi
 
 ## Tech Stack
 
-- **Backend**: NestJS, TypeORM, SQLite/PostgreSQL, Passport JWT
+- **Backend**: NestJS, TypeORM, SQLite, Passport JWT
 - **Frontend**: Angular 21, TailwindCSS, NgRx
 - **Build**: Nx Monorepo
 
